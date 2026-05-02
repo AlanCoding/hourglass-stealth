@@ -1,6 +1,12 @@
 import math
 
-from hourglass_stealth.emission import band_power_w, graybody_luminosity_w, wien_peak_um
+from hourglass_stealth.emission import (
+    band_power_w,
+    equilibrium_temperature_k,
+    graybody_luminosity_w,
+    temperature_with_extra_heat_k,
+    wien_peak_um,
+)
 
 
 def test_graybody_luminosity_scales_with_emissivity() -> None:
@@ -27,3 +33,12 @@ def test_wien_peak_matches_anchor_value() -> None:
 
 def test_band_power_is_positive_over_valid_band() -> None:
     assert band_power_w(0.01, 10.0, 20.0, 100e-6, 200e-6, n=200) > 0.0
+
+
+def test_equilibrium_temperature_matches_graybody_inverse() -> None:
+    power_w = graybody_luminosity_w(0.01, 10.0, 20.0)
+    assert math.isclose(equilibrium_temperature_k(power_w, 0.01, 10.0), 20.0)
+
+
+def test_temperature_with_extra_heat_increases_temperature() -> None:
+    assert temperature_with_extra_heat_k(20.0, 1.0, 0.01, 10.0) > 20.0
