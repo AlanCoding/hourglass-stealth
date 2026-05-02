@@ -1,0 +1,6 @@
+Scenario,Architecture,Optical grade,Emissivity grade,Temperature K,Aperture area m^2,Emitting area m^2,Heat-store volume m^3,Detector diameter m,Dwell years,Survey detection range EM
+Mirror optimistic,mirror,A,A,10.0,10.0,10.0,100.0,1.0,181.84070775518813,0.0014921407011046234
+Mirror baseline,mirror,B,B,20.0,10.0,10.0,10.0,6.5,1.8184889099536203,0.08674972903126744
+Mirror pessimistic,mirror,C,C,50.0,10.0,10.0,1.0,30.0,0.11321171737682417,5.004792059496197
+Lens optimistic,lens,A,A,10.0,10.0,10.0,100.0,1.0,18.184889099536207,0.0014921407011046234
+Lens baseline,lens,B,B,20.0,10.0,10.0,10.0,6.5,0.18193076393271537,0.08674972903126744

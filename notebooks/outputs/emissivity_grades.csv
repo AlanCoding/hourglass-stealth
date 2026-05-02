@@ -1,0 +1,5 @@
+grade,emissivity,interpretation
+A,0.0001,heroic low-emissivity surface
+B,0.001,aggressive engineered surface
+C,0.01,good reflective surface
+D,0.1,poor for stealth

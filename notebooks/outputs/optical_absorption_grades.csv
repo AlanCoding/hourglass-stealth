@@ -1,0 +1,5 @@
+grade,mirror_absorption_per_pass,lens_absorption_per_pass,interpretation
+A,1e-05,0.0001,heroic / speculative
+B,0.0001,0.001,aggressive advanced engineering
+C,0.001,0.01,plausible-good but costly for stealth
+D,0.01,0.1,poor for stealth
