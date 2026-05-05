@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
+<path d="M 0 0 L 8 4 L 0 8 z" fill="#1f2937" />
+</marker>
+</defs>
+<rect x="0" y="0" width="1200" height="1500" fill="#f8fafc" />
+<text x="90" y="50" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#0f172a">Hourglass beta=0.26 deg extremal</text>
+<line x1="316.67" y1="1284.39" x2="434.03" y2="1088.13" stroke="#111827" stroke-width="4.0" stroke-linecap="round" />
+<line x1="883.33" y1="1284.39" x2="765.97" y2="1088.13" stroke="#111827" stroke-width="4.0" stroke-linecap="round" />
+<line x1="434.03" y1="1088.13" x2="434.03" y2="973.17" stroke="#2563eb" stroke-width="3.0" stroke-linecap="round" />
+<line x1="765.97" y1="1088.13" x2="765.97" y2="973.17" stroke="#2563eb" stroke-width="3.0" stroke-linecap="round" />
+<line x1="434.03" y1="973.17" x2="316.67" y2="776.91" stroke="#374151" stroke-width="4.0" stroke-linecap="round" />
+<line x1="765.97" y1="973.17" x2="883.33" y2="776.91" stroke="#374151" stroke-width="4.0" stroke-linecap="round" />
+<line x1="316.67" y1="776.91" x2="316.67" y2="188.13" stroke="#0f766e" stroke-width="3.0" stroke-linecap="round" />
+<line x1="883.33" y1="776.91" x2="883.33" y2="188.13" stroke="#0f766e" stroke-width="3.0" stroke-linecap="round" />
+<line x1="316.67" y1="1284.39" x2="883.33" y2="1284.39" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="6 5" />
+<text x="90" y="82" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#334155">incoming sunlight (+z)</text>
+<text x="600.00" y="1072.43" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">open throat</text>
+<text x="600.00" y="761.21" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">rear mirror span</text>
+<polyline points="317.57,1421.77 316.67,1284.39 765.97,975.98 316.67,667.57 427.45,962.17 507.74,1056.96" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="315.77,1421.77 316.67,1284.39 768.89,968.29 769.61,858.39" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="434.93,1225.51 434.03,1088.13 880.48,781.68 879.76,671.77" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="433.13,1225.51 434.03,1088.13 883.33,774.07 770.26,966.00 708.77,1067.32" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="884.23,1421.77 883.33,1284.39 431.11,968.29 430.39,858.39" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="882.43,1421.77 883.33,1284.39 434.03,975.98 883.33,667.57 772.55,962.17 692.26,1056.96" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="766.87,1225.51 765.97,1088.13 316.67,774.07 429.74,966.00 491.23,1067.32" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="765.07,1225.51 765.97,1088.13 319.52,781.68 320.24,671.77" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<line x1="600.00" y1="975.98" x2="600.00" y2="973.87" stroke="#2563eb" stroke-width="5.0" stroke-linecap="round" stroke-dasharray="4 4" />
+<text x="600.00" y="962.10" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#2563eb">used throat hit interval</text>
+<line x1="883.33" y1="774.07" x2="883.33" y2="377.97" stroke="#0891b2" stroke-width="5.0" stroke-linecap="round" stroke-dasharray="4 4" />
+<text x="883.33" y="366.20" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0891b2">used wall hit interval</text>
+<text x="90" y="126" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#0f172a">facet angle range: -64.13° to 64.13°</text>
+<rect x="830" y="90" width="285" height="258" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+<text x="844" y="116" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">beta = 0.260 deg</text>
+<text x="844" y="134" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">alpha = 22.500 deg</text>
+<text x="844" y="152" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">front span h = 0.500</text>
+<text x="844" y="170" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">throat half-width q = 0.293</text>
+<text x="844" y="188" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rear start z = 0.793</text>
+<text x="844" y="206" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays forward = 4/8</text>
+<text x="844" y="224" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays within cone = 4/8</text>
+<text x="844" y="242" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max cone excess = 157.1999 deg</text>
+<text x="844" y="260" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">mean bounces = 2.75</text>
+<text x="844" y="278" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max bounces = 4</text>
+<text x="844" y="296" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">throat use = 0.786 to 0.791</text>
+<text x="844" y="314" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">wall use = 1.300 to 2.309</text>
+<text x="844" y="332" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">facet specs = 4</text>
+</svg>
