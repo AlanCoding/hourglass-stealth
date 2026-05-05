@@ -18,31 +18,31 @@
 <text x="90" y="82" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#334155">incoming sunlight (+z)</text>
 <text x="600.00" y="1072.43" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">open throat</text>
 <text x="600.00" y="761.21" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0f172a">rear mirror span</text>
-<polyline points="327.05,1421.59 316.67,1284.39 765.97,1004.16 316.67,723.94 428.66,964.20 500.95,1062.03" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="327.05,1421.59 316.67,1284.39 765.97,1004.16 316.67,723.94 765.97,1079.88 336.10,809.41 343.71,699.63" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
 <polyline points="306.29,1421.59 316.67,1284.39 804.10,909.41 812.40,799.66" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
 <polyline points="444.41,1225.33 434.03,1088.13 853.77,826.34 845.47,716.59" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
-<polyline points="423.65,1225.33 434.03,1088.13 883.33,742.48 770.94,964.86 702.12,1063.89" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="423.65,1225.33 434.03,1088.13 883.33,742.48 434.03,1080.71 863.31,810.40 855.76,700.62" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
 <polyline points="893.71,1421.59 883.33,1284.39 395.90,909.41 387.60,799.66" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
-<polyline points="872.95,1421.59 883.33,1284.39 434.03,1004.16 883.33,723.94 771.34,964.20 699.05,1062.03" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
-<polyline points="776.35,1225.33 765.97,1088.13 316.67,742.48 429.06,964.86 497.88,1063.89" fill="none" stroke="#991b1b" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="872.95,1421.59 883.33,1284.39 434.03,1004.16 883.33,723.94 434.03,1079.88 863.90,809.41 856.29,699.63" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+<polyline points="776.35,1225.33 765.97,1088.13 316.67,742.48 765.97,1080.71 336.69,810.40 344.24,700.62" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
 <polyline points="755.59,1225.33 765.97,1088.13 346.23,826.34 354.53,716.59" fill="none" stroke="#2563eb" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
-<line x1="600.00" y1="1004.16" x2="600.00" y2="973.40" stroke="#2563eb" stroke-width="5.0" stroke-linecap="round" stroke-dasharray="4 4" />
+<line x1="600.00" y1="1088.13" x2="600.00" y2="973.40" stroke="#2563eb" stroke-width="5.0" stroke-linecap="round" stroke-dasharray="4 4" />
 <text x="600.00" y="961.62" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#2563eb">used throat hit interval</text>
 <line x1="883.33" y1="774.00" x2="883.33" y2="306.55" stroke="#0891b2" stroke-width="5.0" stroke-linecap="round" stroke-dasharray="4 4" />
 <text x="883.33" y="294.77" font-family="Arial, Helvetica, sans-serif" font-size="14" text-anchor="middle" fill="#0891b2">used wall hit interval</text>
-<text x="90" y="126" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#0f172a">facet angle range: -65.89° to 65.89°</text>
+<text x="90" y="126" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#0f172a">facet angle range: -57.72° to 57.72°</text>
 <rect x="830" y="90" width="285" height="258" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
 <text x="844" y="116" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">beta = 3.000 deg</text>
 <text x="844" y="134" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">alpha = 22.500 deg</text>
 <text x="844" y="152" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">front span h = 0.500</text>
 <text x="844" y="170" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">throat half-width q = 0.293</text>
 <text x="844" y="188" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rear start z = 0.793</text>
-<text x="844" y="206" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays forward = 4/8</text>
-<text x="844" y="224" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays within cone = 4/8</text>
-<text x="844" y="242" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max cone excess = 154.2947 deg</text>
-<text x="844" y="260" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">mean bounces = 2.75</text>
-<text x="844" y="278" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max bounces = 4</text>
-<text x="844" y="296" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">throat use = 0.714 to 0.792</text>
+<text x="844" y="206" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays forward = 8/8</text>
+<text x="844" y="224" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">rays within cone = 8/8</text>
+<text x="844" y="242" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max cone excess = 0.0000 deg</text>
+<text x="844" y="260" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">mean bounces = 3.25</text>
+<text x="844" y="278" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">max bounces = 5</text>
+<text x="844" y="296" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">throat use = 0.500 to 0.792</text>
 <text x="844" y="314" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">wall use = 1.300 to 2.491</text>
 <text x="844" y="332" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#0f172a">facet specs = 28</text>
 </svg>

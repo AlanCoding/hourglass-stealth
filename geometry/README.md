@@ -67,16 +67,17 @@ The bottom skirt is corrected with a vertical throat mirror placed in the open t
 
 ## Top-Skirt Restoration
 
-The top skirt requires a different correction because the displaced rays overflow above the rear mirror span. The package models a macroscopic wall at `x = +-a` and assigns local sawtooth or microfacet angles along that wall so that the top-skirt rays can be redirected back down toward the depleted lower rear edge.
+The top skirt requires a different correction because the displaced rays overflow above the rear mirror span. The package models a macroscopic wall at `x = +-a` and assigns local sawtooth or microfacet angles along that wall so that the top-skirt rays are redirected first into an unused return band at the lower part of the opposite throat, then reflected back into the upper edge of the corresponding rear mirror.
 
 The local facet-angle rule is:
 
 `theta_facet = (gamma + delta) / 2`
 
-where `gamma` and `delta` are the incoming and desired outgoing direction angles in the same signed convention. The code uses a conservative target map unless a more exact analytic mapping is supplied:
+where `gamma` and `delta` are the incoming and desired outgoing direction angles in the same signed convention. The code uses a conservative two-step target map unless a more exact analytic mapping is supplied:
 
-- Lower part of the top-skirt wall hit interval maps to the lower depleted rear edge.
-- Upper part of the wall hit interval maps to slightly above that lower depleted edge.
+- Lower part of the top-skirt wall hit interval maps to the lower throat return band.
+- Upper part of the wall hit interval maps slightly higher in that return band.
+- That throat return band then maps into the upper portion of the rear mirror span, near the top edge, to complete the pass-through.
 
 This preserves the macroscopic wall boundary while allowing local facet angles to vary.
 
@@ -110,7 +111,7 @@ python geometry/sweep_geometry.py --beta-deg 3
 
 ## Known Limitations / TODO
 
-- Current sawtooth target mapping is conservative and heuristic unless a fuller closed-form solution is derived.
+- Current wall-to-throat and throat-to-rear target mapping is conservative and heuristic unless a fuller closed-form solution is derived.
 - Diffraction and finite facet pitch are ignored.
 - Only a 2-D cross-section is modeled; full 3-D annular geometry remains future work.
 - Scattering, absorption, manufacturability, and thermal loading are not modeled here.

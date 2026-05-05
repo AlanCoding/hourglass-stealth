@@ -18,6 +18,7 @@ from hourglass_stealth.geometry_core import (
     ray_segment_intersection,
     sawtooth_target_point,
     segment_tangent_angle_deg,
+    throat_return_target_point,
 )
 
 
@@ -115,6 +116,7 @@ def trace_single_ray(
             hit_point=hit_point,
             config=config,
             wall_range=wall_range,
+            previous_segment=previous_segment,
         )
         outgoing_angle = angle_from_vertical(outgoing_direction)
         hits.append(
@@ -192,8 +194,20 @@ def _reflect_on_segment(
     hit_point: Point,
     config: GeometryConfig,
     wall_range: tuple[float | None, float | None],
+    previous_segment: str | None,
 ) -> Point:
-    if segment.mirror_type in {"front", "rear", "throat_vertical", "wall_vertical"}:
+    if segment.mirror_type in {"front", "rear", "wall_vertical"}:
+        tangent_angle = segment_tangent_angle_deg(segment)
+        return mirror_reflect(direction, tangent_angle)
+
+    if segment.mirror_type == "throat_vertical":
+        if previous_segment is not None and previous_segment.startswith("wall_"):
+            throat_side = "left" if segment.name.endswith("left") else "right"
+            target = throat_return_target_point(config, throat_side, hit_point.z)
+            desired = target - hit_point
+            desired_angle = angle_from_vertical(desired)
+            tangent_angle = normalize_angle_deg((angle_from_vertical(direction) + desired_angle) / 2.0)
+            return mirror_reflect(direction, tangent_angle)
         tangent_angle = segment_tangent_angle_deg(segment)
         return mirror_reflect(direction, tangent_angle)
 

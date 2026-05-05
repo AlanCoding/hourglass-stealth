@@ -361,7 +361,7 @@ def compute_top_skirt_rays(config: GeometryConfig) -> list["Ray"]:
 def compute_vertical_throat_hit_range(config: GeometryConfig) -> tuple[float | None, float | None]:
     from hourglass_stealth.raytrace import trace_rays
 
-    rays = compute_bottom_skirt_rays(config)
+    rays = compute_bottom_skirt_rays(config) + compute_top_skirt_rays(config)
     if not rays:
         return None, None
     results, _ = trace_rays(config, rays, max_bounces=8)
@@ -405,6 +405,17 @@ def compute_sawtooth_wall_hit_range(config: GeometryConfig) -> tuple[float | Non
 
 
 def sawtooth_target_point(config: GeometryConfig, wall_side: str, wall_z: float, wall_range: tuple[float | None, float | None]) -> Point:
+    throat_target, _ = sawtooth_path_targets(config, wall_side, wall_z, wall_range)
+    return throat_target
+
+
+def sawtooth_path_targets(
+    config: GeometryConfig,
+    wall_side: str,
+    wall_z: float,
+    wall_range: tuple[float | None, float | None],
+) -> tuple[Point, Point]:
+    """Return the throat return point and the final rear-edge target for top-skirt recovery."""
     z_min, z_max = wall_range
     h = resolved_front_span_z(config)
     if z_min is None or z_max is None or abs(z_max - z_min) < EPSILON:
@@ -412,12 +423,74 @@ def sawtooth_target_point(config: GeometryConfig, wall_side: str, wall_z: float,
     else:
         fraction = (wall_z - z_min) / (z_max - z_min)
     fraction = max(0.0, min(1.0, fraction))
-    lower_edge_span = 0.18 * h
-    lower_target_z = resolved_rear_start_z(config)
-    target_z = lower_target_z + lower_edge_span * (0.2 + 0.6 * fraction)
-    side = "left" if wall_side == "left" else "right"
-    target = rear_point(config, side, min(h, target_z - resolved_rear_start_z(config)))
-    return target
+
+    geometry = build_hourglass_geometry(config)
+    throat_segment = geometry.throat_right if wall_side == "left" else geometry.throat_left
+    throat_z_low, throat_z_high = throat_return_band(config)
+    rear_target_s = h * (0.82 + 0.16 * fraction)
+    rear_target = rear_point(config, wall_side, min(h, rear_target_s))
+    throat_target_z = throat_z_low + (fraction * (throat_z_high - throat_z_low))
+
+    throat_target = Point(throat_segment.a.x, throat_target_z)
+    return throat_target, rear_target
+
+
+def throat_return_band(config: GeometryConfig) -> tuple[float, float]:
+    geometry = build_hourglass_geometry(config)
+    throat_z_low = geometry.throat_left.a.z
+    throat_z_high = geometry.throat_left.b.z
+    h = resolved_front_span_z(config)
+    bottom_used_min, bottom_used_max = compute_bottom_throat_hit_range(config)
+    band_high = throat_z_low + 0.28 * (throat_z_high - throat_z_low)
+    if bottom_used_min is not None:
+        band_high = min(band_high, max(throat_z_low + 0.06 * h, bottom_used_min - 0.02 * h))
+    if bottom_used_max is not None:
+        band_high = min(band_high, max(throat_z_low + 0.06 * h, bottom_used_max - 0.04 * h))
+    band_low = throat_z_low + 0.03 * h
+    if band_high < band_low:
+        band_high = band_low
+    return band_low, band_high
+
+
+def throat_return_target_point(config: GeometryConfig, throat_side: str, throat_z: float) -> Point:
+    h = resolved_front_span_z(config)
+    band_low, band_high = throat_return_band(config)
+    if abs(band_high - band_low) < EPSILON:
+        fraction = 0.0
+    else:
+        fraction = (throat_z - band_low) / (band_high - band_low)
+    fraction = max(0.0, min(1.0, fraction))
+    rear_side = "right" if throat_side == "left" else "left"
+    rear_target_s = h * (0.82 + 0.16 * fraction)
+    return rear_point(config, rear_side, min(h, rear_target_s))
+
+
+def compute_bottom_throat_hit_range(config: GeometryConfig) -> tuple[float | None, float | None]:
+    from hourglass_stealth.raytrace import trace_rays
+
+    rays = compute_bottom_skirt_rays(config)
+    if not rays:
+        return None, None
+    probe_config = GeometryConfig(
+        aperture_width=config.aperture_width,
+        alpha_deg=config.alpha_deg,
+        beta_deg=config.beta_deg,
+        front_span_z=config.front_span_z,
+        throat_half_width=config.throat_half_width,
+        rear_start_z=config.rear_start_z,
+        include_bottom_throat_mirror=config.include_bottom_throat_mirror,
+        include_top_sawtooth=False,
+    )
+    results, _ = trace_rays(probe_config, rays, max_bounces=8)
+    z_values = [
+        hit.point.z
+        for result in results
+        for hit in result.hits
+        if hit.segment_name.startswith("throat_")
+    ]
+    if not z_values:
+        return None, None
+    return min(z_values), max(z_values)
 
 
 def compute_sawtooth_facet_angles(config: GeometryConfig) -> list[FacetSpec]:
@@ -444,8 +517,8 @@ def compute_sawtooth_facet_angles(config: GeometryConfig) -> list[FacetSpec]:
             if not hit.segment_name.startswith("wall_"):
                 continue
             side = "left" if hit.segment_name.endswith("left") else "right"
-            target = sawtooth_target_point(config, side, hit.point.z, wall_range)
-            delta = target - hit.point
+            throat_target, _ = sawtooth_path_targets(config, side, hit.point.z, wall_range)
+            delta = throat_target - hit.point
             outgoing_angle = angle_from_vertical(delta)
             facet_angle = normalize_angle_deg((hit.incoming_angle_deg + outgoing_angle) / 2.0)
             facets.append(
@@ -453,8 +526,8 @@ def compute_sawtooth_facet_angles(config: GeometryConfig) -> list[FacetSpec]:
                     wall_side=side,
                     z=hit.point.z,
                     incoming_angle_deg=hit.incoming_angle_deg,
-                    target_x=target.x,
-                    target_z=target.z,
+                    target_x=throat_target.x,
+                    target_z=throat_target.z,
                     outgoing_angle_deg=outgoing_angle,
                     facet_angle_deg=facet_angle,
                 )
