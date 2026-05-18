@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 
 from hourglass_stealth.geometry_core import (
+    classify_skirt,
     GeometryConfig,
     compute_sawtooth_facet_angles,
     compute_sawtooth_wall_hit_range,
@@ -29,6 +30,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--front-span-z", type=float, default=0.5)
     parser.add_argument("--alpha-deg", type=float, default=22.5)
     parser.add_argument("--aperture-width", type=float, default=1.0)
+    parser.add_argument("--throat-band-min-min", type=float, default=0.02)
+    parser.add_argument("--throat-band-min-max", type=float, default=0.10)
+    parser.add_argument("--throat-band-min-count", type=int, default=5)
+    parser.add_argument("--throat-band-max-min", type=float, default=0.12)
+    parser.add_argument("--throat-band-max-max", type=float, default=0.40)
+    parser.add_argument("--throat-band-max-count", type=int, default=6)
+    parser.add_argument("--rear-top-target-min-min", type=float, default=0.72)
+    parser.add_argument("--rear-top-target-min-max", type=float, default=0.90)
+    parser.add_argument("--rear-top-target-min-count", type=int, default=6)
+    parser.add_argument("--rear-top-target-max-min", type=float, default=0.88)
+    parser.add_argument("--rear-top-target-max-max", type=float, default=1.00)
+    parser.add_argument("--rear-top-target-max-count", type=int, default=5)
     return parser.parse_args()
 
 
@@ -41,27 +54,47 @@ def main() -> None:
     front_span = args.front_span_z
     for q in linspace(args.q_min, args.q_max, args.q_count):
         for rear_offset in linspace(args.rear_offset_min, args.rear_offset_max, args.rear_offset_count):
-            config = GeometryConfig(
-                aperture_width=args.aperture_width,
-                alpha_deg=args.alpha_deg,
-                beta_deg=args.beta_deg,
-                front_span_z=front_span,
-                throat_half_width=q,
-                rear_start_z=front_span + rear_offset,
-                include_bottom_throat_mirror=True,
-                include_top_sawtooth=True,
-            )
-            rays = sample_input_rays(config, mode="grid", num_rays=24, seed=0)
-            results, metrics = trace_rays(config, rays, max_bounces=8)
-            score = (
-                len(metrics.failed_rays),
-                round(metrics.max_cone_excess_deg, 9),
-                round(metrics.mean_bounces, 9),
-            )
-            if best_score is None or score < best_score:
-                best_score = score
-                best_entry = (config, metrics)
-                best_results = results
+            for throat_band_min in linspace(
+                args.throat_band_min_min,
+                args.throat_band_min_max,
+                args.throat_band_min_count,
+            ):
+                for throat_band_max in linspace(
+                    max(throat_band_min, args.throat_band_max_min),
+                    args.throat_band_max_max,
+                    args.throat_band_max_count,
+                ):
+                    for rear_top_target_min in linspace(
+                        args.rear_top_target_min_min,
+                        args.rear_top_target_min_max,
+                        args.rear_top_target_min_count,
+                    ):
+                        for rear_top_target_max in linspace(
+                            max(rear_top_target_min, args.rear_top_target_max_min),
+                            args.rear_top_target_max_max,
+                            args.rear_top_target_max_count,
+                        ):
+                            config = GeometryConfig(
+                                aperture_width=args.aperture_width,
+                                alpha_deg=args.alpha_deg,
+                                beta_deg=args.beta_deg,
+                                front_span_z=front_span,
+                                throat_half_width=q,
+                                rear_start_z=front_span + rear_offset,
+                                include_bottom_throat_mirror=True,
+                                include_top_sawtooth=True,
+                                throat_return_band_min_fraction=throat_band_min,
+                                throat_return_band_max_fraction=throat_band_max,
+                                rear_top_target_min_fraction=rear_top_target_min,
+                                rear_top_target_max_fraction=rear_top_target_max,
+                            )
+                            rays = sample_input_rays(config, mode="grid", num_rays=24, seed=0)
+                            results, metrics = trace_rays(config, rays, max_bounces=8)
+                            score = score_candidate(config, results, metrics)
+                            if best_score is None or score < best_score:
+                                best_score = score
+                                best_entry = (config, metrics)
+                                best_results = results
 
     if best_entry is None:
         raise RuntimeError("No candidate geometries were evaluated.")
@@ -85,6 +118,10 @@ def main() -> None:
     print(f"  front_span_z = {resolved_front_span_z(config):.6f}")
     print(f"  throat_half_width = {config.throat_half_width:.6f}")
     print(f"  rear_start_z = {config.rear_start_z:.6f}")
+    print(f"  throat_return_band_min_fraction = {config.throat_return_band_min_fraction:.6f}")
+    print(f"  throat_return_band_max_fraction = {config.throat_return_band_max_fraction:.6f}")
+    print(f"  rear_top_target_min_fraction = {config.rear_top_target_min_fraction:.6f}")
+    print(f"  rear_top_target_max_fraction = {config.rear_top_target_max_fraction:.6f}")
     print("metrics")
     print(f"  failed rays = {len(metrics.failed_rays)}")
     print(f"  rays forward = {metrics.rays_forward}/{metrics.total_rays}")
@@ -127,6 +164,39 @@ def fmt_range(value: tuple[float | None, float | None]) -> str:
     if lower is None or upper is None:
         return "none"
     return f"{lower:.6f} to {upper:.6f}"
+
+
+def score_candidate(config: GeometryConfig, results: list, metrics: TraceMetrics) -> tuple[int, int, int, float, float]:
+    top_path_failures = 0
+    bottom_path_failures = 0
+    for result in results:
+        skirt_info = classify_skirt(result.ray, config)
+        if skirt_info is None:
+            continue
+        skirt_kind = skirt_info[0]
+        segments = [hit.segment_name for hit in result.hits]
+        if skirt_kind == "top" and not has_ordered_hits(segments, ("wall_", "throat_", "rear_")):
+            top_path_failures += 1
+        if skirt_kind == "bottom" and not has_ordered_hits(segments, ("throat_", "rear_")):
+            bottom_path_failures += 1
+    return (
+        len(metrics.failed_rays),
+        top_path_failures,
+        bottom_path_failures,
+        round(metrics.max_cone_excess_deg, 9),
+        round(metrics.mean_bounces, 9),
+    )
+
+
+def has_ordered_hits(segments: list[str], prefixes: tuple[str, ...]) -> bool:
+    cursor = 0
+    for prefix in prefixes:
+        while cursor < len(segments) and not segments[cursor].startswith(prefix):
+            cursor += 1
+        if cursor >= len(segments):
+            return False
+        cursor += 1
+    return True
 
 
 if __name__ == "__main__":

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from html import escape
+import os
 from pathlib import Path
 
 from hourglass_stealth.geometry_core import (
@@ -48,6 +49,153 @@ def write_svg(
     output.parent.mkdir(parents=True, exist_ok=True)
     svg_text = build_svg_document(config=config, traced_results=traced_results, metrics=metrics, title=title)
     output.write_text(svg_text, encoding="utf-8")
+    return output
+
+
+def write_png(
+    output_path: str | Path,
+    config: GeometryConfig,
+    traced_results: list[RayTraceResult],
+    metrics: TraceMetrics,
+    title: str = "Mirror Hourglass Geometry",
+) -> Path:
+    os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import FancyBboxPatch
+
+    output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    geometry = build_hourglass_geometry(config)
+    wall_range = compute_sawtooth_wall_hit_range(config)
+    throat_range = compute_vertical_throat_hit_range(config)
+    facets = compute_sawtooth_facet_angles(config)
+
+    viewport = SvgViewport(
+        xmin=-(config.aperture_width * 0.9),
+        xmax=(config.aperture_width * 0.9),
+        zmin=-0.32,
+        zmax=geometry.wall_top_z + 0.25,
+    )
+
+    fig, ax = plt.subplots(figsize=(10, 12), dpi=160)
+    fig.patch.set_facecolor("#f8fafc")
+    ax.set_facecolor("#f8fafc")
+
+    for segment in geometry.segments:
+        stroke, width, dash = _segment_style(segment.mirror_type)
+        line, = ax.plot(
+            [segment.a.x, segment.b.x],
+            [segment.a.z, segment.b.z],
+            color=stroke,
+            linewidth=width / 1.5,
+            solid_capstyle="round",
+        )
+        if dash:
+            line.set_dashes([float(item) for item in dash.split()])
+
+    ax.plot(
+        [-config.aperture_width / 2.0, config.aperture_width / 2.0],
+        [0.0, 0.0],
+        color="#94a3b8",
+        linewidth=1.2,
+        dashes=(6, 5),
+    )
+
+    for result in traced_results:
+        path = ray_path(result, tail_length=0.28)
+        if result.within_solar_cone:
+            stroke = "#2563eb"
+        elif result.exits_forward:
+            stroke = "#f97316"
+        else:
+            stroke = "#991b1b"
+        ax.plot(
+            [point.x for point in path],
+            [point.z for point in path],
+            color=stroke,
+            linewidth=1.5,
+            alpha=0.9,
+        )
+
+    for hit_range, color, x in (
+        (throat_range, "#2563eb", 0.0),
+        (wall_range, "#0891b2", config.aperture_width / 2.0),
+    ):
+        z_min, z_max = hit_range
+        if z_min is None or z_max is None:
+            continue
+        ax.plot([x, x], [z_min, z_max], color=color, linewidth=3.0, dashes=(4, 4))
+
+    ax.text(
+        viewport.xmin,
+        geometry.wall_top_z + 0.18,
+        title,
+        fontsize=16,
+        color="#0f172a",
+        ha="left",
+        va="bottom",
+    )
+    ax.text(
+        viewport.xmin,
+        geometry.wall_top_z + 0.08,
+        "incoming sunlight (+z)",
+        fontsize=10,
+        color="#334155",
+        ha="left",
+        va="bottom",
+    )
+    ax.text(0.0, resolved_front_span_z(config) + 0.04, "open throat", fontsize=9, color="#0f172a", ha="center")
+    ax.text(0.0, resolved_rear_start_z(config) + resolved_front_span_z(config) + 0.04, "rear mirror span", fontsize=9, color="#0f172a", ha="center")
+
+    metric_lines = [
+        f"beta = {config.beta_deg:.3f} deg",
+        f"alpha = {config.alpha_deg:.3f} deg",
+        f"front span h = {resolved_front_span_z(config):.3f}",
+        f"throat half-width q = {build_hourglass_geometry(config).throat_left.a.x * -1.0:.3f}",
+        f"rear start z = {resolved_rear_start_z(config):.3f}",
+        f"rays forward = {metrics.rays_forward}/{metrics.total_rays}",
+        f"rays within cone = {metrics.rays_within_cone}/{metrics.total_rays}",
+        f"max cone excess = {metrics.max_cone_excess_deg:.4f} deg",
+        f"mean bounces = {metrics.mean_bounces:.2f}",
+        f"max bounces = {metrics.max_bounces}",
+        f"throat use = {_fmt_range(throat_range)}",
+        f"wall use = {_fmt_range(wall_range)}",
+        f"facet specs = {len(facets)}",
+    ]
+    if facets:
+        metric_lines.append(
+            f"facet angle range = {min(spec.facet_angle_deg for spec in facets):.2f} to {max(spec.facet_angle_deg for spec in facets):.2f} deg"
+        )
+
+    box = FancyBboxPatch(
+        (0.72, 0.74),
+        0.25,
+        0.23,
+        transform=ax.transAxes,
+        boxstyle="round,pad=0.012",
+        linewidth=1.0,
+        edgecolor="#cbd5e1",
+        facecolor="#ffffff",
+    )
+    ax.add_patch(box)
+    ax.text(
+        0.735,
+        0.955,
+        "\n".join(metric_lines),
+        transform=ax.transAxes,
+        fontsize=8.5,
+        color="#0f172a",
+        ha="left",
+        va="top",
+        linespacing=1.35,
+    )
+
+    ax.set_xlim(viewport.xmin, viewport.xmax)
+    ax.set_ylim(viewport.zmin, viewport.zmax)
+    ax.axis("off")
+    fig.tight_layout(pad=0.6)
+    fig.savefig(output, dpi=160, facecolor=fig.get_facecolor(), bbox_inches="tight")
+    plt.close(fig)
     return output
 
 

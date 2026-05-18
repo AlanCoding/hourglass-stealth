@@ -79,7 +79,52 @@ where `gamma` and `delta` are the incoming and desired outgoing direction angles
 - Upper part of the wall hit interval maps slightly higher in that return band.
 - That throat return band then maps into the upper portion of the rear mirror span, near the top edge, to complete the pass-through.
 
-This preserves the macroscopic wall boundary while allowing local facet angles to vary.
+This preserves the macroscopic wall boundary while allowing local facet angles to vary. The wall region is intentionally short: it extends only a small distance above the rear mirror so that it catches the intended diverging top-skirt family rather than rays that have already completed the rear interaction.
+
+The lower throat return reflector is direction-selective in the current model. For rays that arrive there from the top wall while still traveling upward, the local behavior falls back to an ordinary flat vertical mirror response. For rays that arrive there from the wall while traveling downward, the angled return behavior is used to send them back toward the rear-top target band. In 2-D terms, the flat-mirror case keeps the same `z` component and simply flips the sign of the `x` component.
+
+## Geometry-Driven Optimization
+
+The correction angles should not be guessed independently of the geometry. In the current model the optimization variables are geometric targets, and the required mirror angles are derived from those targets ray by ray.
+
+For a top-skirt ray that hits the wall at point `W`, choose:
+
+- a throat return point `T` on the opposite lower throat return band
+- a rear target point `R` on the upper part of the rear mirror span
+
+Then derive the mirror tangent angles from actual transport geometry:
+
+- wall facet angle:
+  `theta_wall = (gamma_in + gamma_WT) / 2`
+- throat return angle:
+  `theta_throat = (gamma_WT + gamma_TR) / 2`
+
+where:
+
+- `gamma_in` is the incoming direction at the wall
+- `gamma_WT` is the direction from `W` to `T`
+- `gamma_TR` is the direction from `T` to `R`
+
+So the search problem is not "pick arbitrary reflection angles." It is:
+
+- choose throat half-width `q`
+- choose rear placement
+- choose the lower throat return band
+- choose the upper rear target band
+- derive the needed wall and throat reflection angles from those choices
+- trace the resulting rays and test for closure
+
+This is closer to the intended philosophy: closure should come from a self-consistent geometry, not from ad hoc angle nudges.
+
+The sweep script therefore scores candidates using real traced rays and penalizes not only cone failure but also path failure. In particular, top-skirt rays are expected to follow:
+
+- `wall -> throat -> rear`
+
+and bottom-skirt rays are expected to follow:
+
+- `throat -> rear`
+
+If a candidate exits within cone only because it avoids the intended correction path, that candidate is not treated as a true closure solution.
 
 ## Success Criterion
 
@@ -112,6 +157,7 @@ python geometry/sweep_geometry.py --beta-deg 3
 ## Known Limitations / TODO
 
 - Current wall-to-throat and throat-to-rear target mapping is conservative and heuristic unless a fuller closed-form solution is derived.
+- The optimization is still a coarse search over geometric bands rather than a continuous solver.
 - Diffraction and finite facet pitch are ignored.
 - Only a 2-D cross-section is modeled; full 3-D annular geometry remains future work.
 - Scattering, absorption, manufacturability, and thermal loading are not modeled here.

@@ -7,7 +7,7 @@ import argparse
 
 from hourglass_stealth.geometry_core import GeometryConfig, sample_input_rays
 from hourglass_stealth.raytrace import trace_rays
-from hourglass_stealth.svg import write_svg
+from hourglass_stealth.svg import write_png, write_svg
 
 
 def parse_args() -> argparse.Namespace:
@@ -45,7 +45,10 @@ def main() -> None:
     )
     rays = sample_input_rays(config, mode=args.mode, num_rays=args.num_rays, seed=args.seed)
     results, metrics = trace_rays(config, rays, max_bounces=8)
-    path = write_svg(args.output, config, results, metrics, title=f"Hourglass beta={args.beta_deg:g} deg mode={args.mode}")
+    if args.output.lower().endswith(".png"):
+        path = write_png(args.output, config, results, metrics, title=f"Hourglass beta={args.beta_deg:g} deg mode={args.mode}")
+    else:
+        path = write_svg(args.output, config, results, metrics, title=f"Hourglass beta={args.beta_deg:g} deg mode={args.mode}")
     print(f"wrote {path}")
     print(f"rays within cone: {metrics.rays_within_cone}/{metrics.total_rays}")
     print(f"max cone excess deg: {metrics.max_cone_excess_deg:.6f}")

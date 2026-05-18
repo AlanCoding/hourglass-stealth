@@ -100,6 +100,8 @@ def trace_single_ray(
                 continue
             if segment.mirror_type == "guide":
                 continue
+            if previous_segment is not None and previous_segment.startswith("rear_") and segment.name.startswith("wall_"):
+                continue
             hit = ray_segment_intersection(position, direction, segment)
             if hit is None:
                 continue
@@ -202,21 +204,28 @@ def _reflect_on_segment(
 
     if segment.mirror_type == "throat_vertical":
         if previous_segment is not None and previous_segment.startswith("wall_"):
+            if direction.z > 0.0:
+                return mirror_reflect(direction, segment_tangent_angle_deg(segment))
             throat_side = "left" if segment.name.endswith("left") else "right"
             target = throat_return_target_point(config, throat_side, hit_point.z)
             desired = target - hit_point
             desired_angle = angle_from_vertical(desired)
-            tangent_angle = normalize_angle_deg((angle_from_vertical(direction) + desired_angle) / 2.0)
+            tangent_angle = normalize_angle_deg(
+                ((angle_from_vertical(direction) + desired_angle) / 2.0) + config.throat_return_angle_offset_deg
+            )
             return mirror_reflect(direction, tangent_angle)
         tangent_angle = segment_tangent_angle_deg(segment)
         return mirror_reflect(direction, tangent_angle)
 
     if segment.mirror_type == "wall_sawtooth":
+        incoming_angle = angle_from_vertical(direction)
         wall_side = "left" if segment.name.endswith("left") else "right"
         target = sawtooth_target_point(config, wall_side, hit_point.z, wall_range)
         desired = target - hit_point
         desired_angle = angle_from_vertical(desired)
-        tangent_angle = normalize_angle_deg((angle_from_vertical(direction) + desired_angle) / 2.0)
+        tangent_angle = normalize_angle_deg(
+            ((incoming_angle + desired_angle) / 2.0) + config.wall_facet_angle_offset_deg
+        )
         return mirror_reflect(direction, tangent_angle)
 
     raise ValueError(f"Unsupported mirror type: {segment.mirror_type}")

@@ -50,6 +50,13 @@ class GeometryConfig:
     rear_start_z: float | None = None
     include_bottom_throat_mirror: bool = True
     include_top_sawtooth: bool = True
+    wall_extension_z: float = 0.35
+    wall_facet_angle_offset_deg: float = 0.0
+    throat_return_angle_offset_deg: float = 0.0
+    throat_return_band_min_fraction: float = 0.03
+    throat_return_band_max_fraction: float = 0.28
+    rear_top_target_min_fraction: float = 0.82
+    rear_top_target_max_fraction: float = 0.98
 
 
 @dataclass(frozen=True)
@@ -198,12 +205,14 @@ def rear_point(config: GeometryConfig, side: str, s: float) -> Point:
     return Point(x, z)
 
 
-def build_hourglass_geometry(config: GeometryConfig, wall_extra_z: float = 1.5) -> HourglassGeometry:
+def build_hourglass_geometry(config: GeometryConfig, wall_extra_z: float | None = None) -> HourglassGeometry:
     a = config.aperture_width / 2.0
     h = resolved_front_span_z(config)
     q = resolved_throat_half_width(config)
     zr = resolved_rear_start_z(config)
     zb = zr + h
+    if wall_extra_z is None:
+        wall_extra_z = config.wall_extension_z
     wall_top_z = zb + wall_extra_z
 
     front_left = Segment("front_left", Point(-a, 0.0), Point(-q, h), "front")
@@ -441,12 +450,12 @@ def throat_return_band(config: GeometryConfig) -> tuple[float, float]:
     throat_z_high = geometry.throat_left.b.z
     h = resolved_front_span_z(config)
     bottom_used_min, bottom_used_max = compute_bottom_throat_hit_range(config)
-    band_high = throat_z_low + 0.28 * (throat_z_high - throat_z_low)
+    band_high = throat_z_low + config.throat_return_band_max_fraction * (throat_z_high - throat_z_low)
     if bottom_used_min is not None:
         band_high = min(band_high, max(throat_z_low + 0.06 * h, bottom_used_min - 0.02 * h))
     if bottom_used_max is not None:
         band_high = min(band_high, max(throat_z_low + 0.06 * h, bottom_used_max - 0.04 * h))
-    band_low = throat_z_low + 0.03 * h
+    band_low = throat_z_low + config.throat_return_band_min_fraction * h
     if band_high < band_low:
         band_high = band_low
     return band_low, band_high
@@ -461,7 +470,10 @@ def throat_return_target_point(config: GeometryConfig, throat_side: str, throat_
         fraction = (throat_z - band_low) / (band_high - band_low)
     fraction = max(0.0, min(1.0, fraction))
     rear_side = "right" if throat_side == "left" else "left"
-    rear_target_s = h * (0.82 + 0.16 * fraction)
+    rear_target_s = h * (
+        config.rear_top_target_min_fraction
+        + ((config.rear_top_target_max_fraction - config.rear_top_target_min_fraction) * fraction)
+    )
     return rear_point(config, rear_side, min(h, rear_target_s))
 
 
